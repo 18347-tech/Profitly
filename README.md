@@ -1,6 +1,6 @@
-# LocalLedger
+# Profitly
 
-LocalLedger is a simple web-based finance tracker designed to help small local businesses record income and expenses and view basic profit summaries.
+Profitly is a simple web-based finance tracker designed to help small local businesses record income and expenses and view basic profit summaries.
 
 ## Features
 - Add income and expenses
