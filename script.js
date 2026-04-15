@@ -7,11 +7,12 @@ function addTransaction() {
     const name = document.getElementById("name").value;
     const amount = parseFloat(document.getElementById("amount").value);
     const type = document.getElementById("type").value;
+    const category = document.getElementById("category").value;
 
     if (!name || isNaN(amount)) return;
 
     const item = document.createElement("li");
-    item.textContent = `${name} - $${amount} (${type})`;
+    item.textContent = `${name} - $${amount} (${type}, ${category})`;
     list.appendChild(item);
 
     if (type === "income") income += amount;
@@ -22,7 +23,6 @@ function addTransaction() {
 
     document.getElementById("name").value = "";
     document.getElementById("amount").value = "";
-    const category = document.getElementById("category").value;
 }
 
 function updateSummary() {
