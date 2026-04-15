@@ -22,6 +22,7 @@ function addTransaction() {
 
     // ✅ SAVE in array
     transactions.push(transaction);
+    saveTransactions(); 
 
     // ✅ CREATE UI item (same as before)
     const item = document.createElement("li");
@@ -64,3 +65,52 @@ function updateChart() {
         }
     });
 }
+function saveTransactions() {
+    localStorage.setItem("transactions", JSON.stringify(transactions));
+} 
+function loadTransactions() {
+    const data = localStorage.getItem("transactions");
+
+    if (data) {
+        transactions = JSON.parse(data);
+    }
+} 
+function updateChart() {
+    const ctx = document.getElementById("chart");
+
+    if (chart) chart.destroy();
+
+    chart = new Chart(ctx, {
+        type: "doughnut",
+        data: {
+            labels: ["Income", "Expenses"],
+            datasets: [{
+                data: [income, expenses],
+                backgroundColor: ["#22c55e", "#ef4444"]
+            }]
+        }
+    });
+}
+
+// ✅ ADD IT RIGHT BELOW (or anywhere around here)
+function displayTransactions() {
+    list.innerHTML = "";
+
+    income = 0;
+    expenses = 0;
+
+    transactions.forEach(t => {
+        const item = document.createElement("li");
+        item.textContent = `${t.name} - $${t.amount} (${t.type}, ${t.category})`;
+        list.appendChild(item);
+
+        if (t.type === "income") income += t.amount;
+        else expenses += t.amount;
+    });
+
+    updateSummary();
+    updateChart();
+}
+
+loadTransactions();
+displayTransactions(); 
