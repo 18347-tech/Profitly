@@ -22,6 +22,9 @@ function addTransaction() {
 
     document.getElementById("name").value = "";
     document.getElementById("amount").value = "";
+    const description = document.getElementById("description").value;
+const amount = document.getElementById("amount").value;
+const type = document.getElementById("type").value;
 }
 
 function updateSummary() {
