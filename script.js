@@ -1,3 +1,4 @@
+let transactions = [];
 let income = 0;
 let expenses = 0;
 
@@ -11,16 +12,30 @@ function addTransaction() {
 
     if (!name || isNaN(amount)) return;
 
+    // ✅ CREATE transaction object
+    const transaction = {
+        name,
+        amount,
+        type,
+        category
+    };
+
+    // ✅ SAVE in array
+    transactions.push(transaction);
+
+    // ✅ CREATE UI item (same as before)
     const item = document.createElement("li");
     item.textContent = `${name} - $${amount} (${type}, ${category})`;
     list.appendChild(item);
 
+    // ✅ UPDATE totals
     if (type === "income") income += amount;
     else expenses += amount;
 
     updateSummary();
     updateChart();
 
+    // clear inputs
     document.getElementById("name").value = "";
     document.getElementById("amount").value = "";
 }
