@@ -151,7 +151,8 @@ function renderTransactions() {
     });
 
     updateSummary(income, expenses, filtered.length);
-    updateChart(income, expenses);
+updateChart(income, expenses);
+checkEmptyState(filtered.length);
 }
 
 /* =========================
@@ -198,3 +199,13 @@ renderTransactions();
 ========================= */
 
 searchEl.addEventListener("input", renderTransactions);
+
+function checkEmptyState(filteredLength) {
+    const empty = document.getElementById("emptyState");
+
+    if (filteredLength === 0) {
+        empty.style.display = "block";
+    } else {
+        empty.style.display = "none";
+    }
+}
