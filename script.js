@@ -695,3 +695,13 @@ document.addEventListener('keydown', e => {
 
 // ─── START ───────────────────────────────────────────────────────────────────
 init();
+
+function resetData() {
+  if (confirm('Delete ALL transactions and start fresh? This cannot be undone.')) {
+    transactions = [];
+    save();
+    renderAll();
+    populateYearDropdown();
+    showToast('All data cleared.', 'error');
+  }
+}
