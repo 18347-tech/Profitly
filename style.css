@@ -677,3 +677,23 @@ body {
   .kpi-grid { grid-template-columns: 1fr 1fr; }
   .view { padding: 16px; }
 }
+
+/* ── CLICK FIX ── */
+.sidebar {
+  z-index: 50 !important;
+  pointer-events: auto;
+}
+
+.main {
+  margin-left: var(--sidebar-w) !important;
+  position: relative;
+  z-index: 1;
+}
+
+.modal-overlay {
+  pointer-events: none;
+}
+
+.modal-overlay.open {
+  pointer-events: auto;
+}
