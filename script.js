@@ -1,116 +1,200 @@
+/* =========================
+   LOCALLEDGER - APP STATE
+========================= */
+
 let transactions = [];
-let income = 0;
-let expenses = 0;
+let filterType = "all";
+let chart;
+
+/* =========================
+   DOM ELEMENTS
+========================= */
 
 const list = document.getElementById("list");
+const incomeEl = document.getElementById("income");
+const expenseEl = document.getElementById("expenses");
+const profitEl = document.getElementById("profit");
+const totalTxEl = document.getElementById("totalTx");
+const searchEl = document.getElementById("search");
+
+/* =========================
+   LOAD DATA
+========================= */
+
+function loadTransactions() {
+    const data = localStorage.getItem("transactions");
+    if (data) {
+        transactions = JSON.parse(data);
+    }
+}
+
+/* =========================
+   SAVE DATA
+========================= */
+
+function saveTransactions() {
+    localStorage.setItem("transactions", JSON.stringify(transactions));
+}
+
+/* =========================
+   ADD TRANSACTION
+========================= */
 
 function addTransaction() {
     const name = document.getElementById("name").value;
     const amount = parseFloat(document.getElementById("amount").value);
     const type = document.getElementById("type").value;
     const category = document.getElementById("category").value;
+    const date = document.getElementById("date").value;
 
     if (!name || isNaN(amount)) return;
 
-    // ✅ CREATE transaction object
     const transaction = {
+        id: Date.now(),
         name,
         amount,
         type,
-        category
+        category,
+        date: date || new Date().toISOString().split("T")[0]
     };
 
-    // ✅ SAVE in array
     transactions.push(transaction);
-    saveTransactions(); 
+    saveTransactions();
 
-    // ✅ CREATE UI item (same as before)
-    const item = document.createElement("li");
-    item.textContent = `${name} - $${amount} (${type}, ${category})`;
-    list.appendChild(item);
+    clearForm();
+    renderTransactions();
+}
 
-    // ✅ UPDATE totals
-    if (type === "income") income += amount;
-    else expenses += amount;
+/* =========================
+   DELETE TRANSACTION
+========================= */
 
-    updateSummary();
-    updateChart();
+function deleteTransaction(id) {
+    transactions = transactions.filter(t => t.id !== id);
+    saveTransactions();
+    renderTransactions();
+}
 
-    // clear inputs
+/* =========================
+   CLEAR FORM
+========================= */
+
+function clearForm() {
     document.getElementById("name").value = "";
     document.getElementById("amount").value = "";
 }
 
-function updateSummary() {
-    document.getElementById("income").textContent = income;
-    document.getElementById("expenses").textContent = expenses;
-    document.getElementById("profit").textContent = income - expenses;
+/* =========================
+   FILTER
+========================= */
+
+function setFilter(type) {
+    filterType = type;
+    renderTransactions();
 }
 
-let chart;
+/* =========================
+   FILTER + SEARCH LOGIC
+========================= */
 
-function updateChart() {
-    const ctx = document.getElementById("chart");
+function getFilteredTransactions() {
+    const search = searchEl.value.toLowerCase();
 
-    if (chart) chart.destroy();
+    return transactions.filter(t => {
+        const matchesType = filterType === "all" || t.type === filterType;
+        const matchesSearch =
+            t.name.toLowerCase().includes(search) ||
+            t.category.toLowerCase().includes(search);
 
-    chart = new Chart(ctx, {
-        type: "doughnut",
-        data: {
-            labels: ["Income", "Expenses"],
-            datasets: [{
-                data: [income, expenses],
-                backgroundColor: ["#22c55e", "#ef4444"]
-            }]
-        }
-    });
-}
-function saveTransactions() {
-    localStorage.setItem("transactions", JSON.stringify(transactions));
-} 
-function loadTransactions() {
-    const data = localStorage.getItem("transactions");
-
-    if (data) {
-        transactions = JSON.parse(data);
-    }
-} 
-function updateChart() {
-    const ctx = document.getElementById("chart");
-
-    if (chart) chart.destroy();
-
-    chart = new Chart(ctx, {
-        type: "doughnut",
-        data: {
-            labels: ["Income", "Expenses"],
-            datasets: [{
-                data: [income, expenses],
-                backgroundColor: ["#22c55e", "#ef4444"]
-            }]
-        }
+        return matchesType && matchesSearch;
     });
 }
 
-// ✅ ADD IT RIGHT BELOW (or anywhere around here)
-function displayTransactions() {
+/* =========================
+   RENDER TRANSACTIONS
+========================= */
+
+function renderTransactions() {
     list.innerHTML = "";
 
-    income = 0;
-    expenses = 0;
+    const filtered = getFilteredTransactions();
 
-    transactions.forEach(t => {
-        const item = document.createElement("li");
-        item.textContent = `${t.name} - $${t.amount} (${t.type}, ${t.category})`;
-        list.appendChild(item);
+    let income = 0;
+    let expenses = 0;
 
+    filtered.forEach(t => {
         if (t.type === "income") income += t.amount;
         else expenses += t.amount;
+
+        const div = document.createElement("div");
+        div.className = `transaction ${t.type}`;
+
+        div.innerHTML = `
+            <div class="tx-info">
+                <div class="tx-name">${t.name}</div>
+                <div class="tx-meta">
+                    ${t.category} • ${t.date}
+                </div>
+            </div>
+
+            <div>
+                <strong>
+                    ${t.type === "income" ? "+" : "-"}$${t.amount}
+                </strong>
+                <button onclick="deleteTransaction(${t.id})" style="margin-top:6px; background:#ef4444;">
+                    Delete
+                </button>
+            </div>
+        `;
+
+        list.appendChild(div);
     });
 
-    updateSummary();
-    updateChart();
+    updateSummary(income, expenses, filtered.length);
+    updateChart(income, expenses);
 }
 
+/* =========================
+   SUMMARY
+========================= */
+
+function updateSummary(income, expenses, total) {
+    incomeEl.textContent = `$${income}`;
+    expenseEl.textContent = `$${expenses}`;
+    profitEl.textContent = `$${income - expenses}`;
+    totalTxEl.textContent = total;
+}
+
+/* =========================
+   CHART
+========================= */
+
+function updateChart(income, expenses) {
+    const ctx = document.getElementById("chart");
+
+    if (chart) chart.destroy();
+
+    chart = new Chart(ctx, {
+        type: "doughnut",
+        data: {
+            labels: ["Income", "Expenses"],
+            datasets: [{
+                data: [income, expenses],
+                backgroundColor: ["#16a34a", "#dc2626"]
+            }]
+        }
+    });
+}
+
+/* =========================
+   INITIAL LOAD
+========================= */
+
 loadTransactions();
-displayTransactions(); 
+renderTransactions();
+
+/* =========================
+   LIVE SEARCH
+========================= */
+
+searchEl.addEventListener("input", renderTransactions);
