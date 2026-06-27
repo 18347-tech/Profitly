@@ -192,3 +192,40 @@ button:hover {
         grid-template-columns: repeat(2, 1fr);
     }
 }
+
+/* =========================
+   BUTTON POLISH
+========================= */
+
+button {
+    transition: all 0.2s ease;
+}
+
+button:active {
+    transform: scale(0.98);
+}
+
+/* Delete button style override */
+.transaction button {
+    width: auto;
+    padding: 6px 10px;
+    font-size: 12px;
+    border-radius: 6px;
+}
+
+/* =========================
+   HOVER EFFECTS
+========================= */
+
+.card:hover {
+    transform: translateY(-2px);
+    transition: 0.2s ease;
+}
+
+/* =========================
+   FILTER ACTIVE STATE (visual improvement)
+========================= */
+
+.filters button {
+    cursor: pointer;
+}
