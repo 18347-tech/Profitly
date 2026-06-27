@@ -1,42 +1,96 @@
+/* =========================
+   GLOBAL STYLES
+========================= */
+
 body {
     font-family: Arial, sans-serif;
-    background: linear-gradient(135deg, #e0f2fe, #f8fafc);
     margin: 0;
-    padding: 0;
-}
-
-.container {
-    width: 90%;
-    max-width: 750px;
-    margin: 40px auto;
-}
-
-h1 {
-    text-align: center;
+    background: linear-gradient(135deg, #eef2ff, #f8fafc);
     color: #0f172a;
-    font-size: 36px;
 }
 
-.subtitle {
-    text-align: center;
-    color: #475569;
-    margin-bottom: 25px;
+.app {
+    width: 92%;
+    max-width: 900px;
+    margin: 30px auto;
 }
+
+/* =========================
+   HEADER
+========================= */
+
+.header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.header h1 {
+    font-size: 36px;
+    margin: 0;
+}
+
+.header p {
+    color: #64748b;
+}
+
+/* =========================
+   CARDS
+========================= */
 
 .card {
     background: white;
-    padding: 20px;
-    margin: 15px 0;
-    border-radius: 12px;
-    box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+    padding: 18px;
+    margin: 12px 0;
+    border-radius: 14px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
 }
 
-input, select {
+/* =========================
+   DASHBOARD
+========================= */
+
+.dashboard {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin: 20px 0;
+}
+
+.dashboard .card {
+    text-align: center;
+    padding: 15px;
+}
+
+.dashboard h3 {
+    margin: 5px 0;
+    font-size: 14px;
+    color: #64748b;
+}
+
+.dashboard p {
+    font-size: 20px;
+    font-weight: bold;
+    margin: 0;
+}
+
+/* Color accents */
+.income p { color: #16a34a; }
+.expense p { color: #dc2626; }
+.profit p { color: #2563eb; }
+.total p { color: #0f172a; }
+
+/* =========================
+   FORM
+========================= */
+
+.form-card input,
+.form-card select {
     width: 100%;
     padding: 12px;
     margin: 8px 0;
+    border-radius: 10px;
     border: 1px solid #e2e8f0;
-    border-radius: 8px;
+    font-size: 14px;
 }
 
 button {
@@ -45,25 +99,96 @@ button {
     background: #2563eb;
     color: white;
     border: none;
+    border-radius: 10px;
     cursor: pointer;
-    border-radius: 8px;
     font-weight: bold;
+    transition: 0.2s;
 }
 
 button:hover {
     background: #1d4ed8;
 }
 
-.summary p {
-    font-size: 18px;
+/* =========================
+   CONTROLS
+========================= */
+
+.controls {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 10px 0;
 }
 
-ul {
-    list-style: none;
-    padding: 0;
+.controls input {
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
 }
 
-li {
-    padding: 10px;
-    border-bottom: 1px solid #f1f5f9;
+.filters {
+    display: flex;
+    gap: 10px;
+}
+
+.filters button {
+    flex: 1;
+    background: #e2e8f0;
+    color: #0f172a;
+}
+
+.filters button:hover {
+    background: #cbd5e1;
+}
+
+/* =========================
+   TRANSACTIONS
+========================= */
+
+#list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.transaction {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    border-radius: 10px;
+    background: #f8fafc;
+    border-left: 5px solid #cbd5e1;
+}
+
+.transaction.income {
+    border-left-color: #16a34a;
+}
+
+.transaction.expense {
+    border-left-color: #dc2626;
+}
+
+.tx-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.tx-name {
+    font-weight: bold;
+}
+
+.tx-meta {
+    font-size: 12px;
+    color: #64748b;
+}
+
+/* =========================
+   SMALL SCREEN
+========================= */
+
+@media (max-width: 700px) {
+    .dashboard {
+        grid-template-columns: repeat(2, 1fr);
+    }
 }
