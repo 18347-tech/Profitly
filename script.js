@@ -51,10 +51,11 @@ function switchView(viewId, btn) {
   document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
   document.getElementById('view-' + viewId).classList.add('active');
   if (btn) btn.classList.add('active');
-  const titles = { dashboard: 'Dashboard', transactions: 'Transactions', analytics: 'Analytics', insights: 'Insights' };
+  const titles = { dashboard: 'Dashboard', transactions: 'Transactions', analytics: 'Analytics', insights: 'Insights', reviews: 'Reviews' };
   document.getElementById('topbarTitle').textContent = titles[viewId] || viewId;
   if (viewId === 'analytics') renderAnalytics();
   if (viewId === 'insights')  renderInsights();
+  if (viewId === 'reviews')   renderAppReviews();
   closeSidebarOnMobile();
 }
 
@@ -68,15 +69,15 @@ function closeSidebarOnMobile() {
 
 // ─── KPIs ────────────────────────────────────────────────────────────────────
 function renderKPIs() {
-  const all = transactions;
+  const all           = transactions;
   const totalIncome   = sum(all, 'income');
   const totalExpenses = sum(all, 'expense');
   const profit        = totalIncome - totalExpenses;
   const margin        = totalIncome > 0 ? ((profit / totalIncome) * 100).toFixed(1) : 0;
 
-  const now   = new Date();
-  const month = now.getMonth();
-  const year  = now.getFullYear();
+  const now       = new Date();
+  const month     = now.getMonth();
+  const year      = now.getFullYear();
   const thisMonth = all.filter(t => {
     const d = new Date(t.date);
     return d.getMonth() === month && d.getFullYear() === year;
@@ -84,32 +85,31 @@ function renderKPIs() {
   const mIncome   = sum(thisMonth, 'income');
   const mExpenses = sum(thisMonth, 'expense');
 
-  document.getElementById('kpiIncome').textContent    = fmt(totalIncome);
-  document.getElementById('kpiExpenses').textContent  = fmt(totalExpenses);
-  document.getElementById('kpiProfit').textContent    = fmt(profit);
-  document.getElementById('kpiTxCount').textContent   = all.length;
+  document.getElementById('kpiIncome').textContent      = fmt(totalIncome);
+  document.getElementById('kpiExpenses').textContent    = fmt(totalExpenses);
+  document.getElementById('kpiProfit').textContent      = fmt(profit);
+  document.getElementById('kpiTxCount').textContent     = all.length;
   document.getElementById('kpiIncomeSub').textContent   = `This month: ${fmt(mIncome)}`;
   document.getElementById('kpiExpensesSub').textContent = `This month: ${fmt(mExpenses)}`;
-  document.getElementById('kpiMargin').textContent    = `Margin: ${margin}%`;
-  document.getElementById('kpiTxSub').textContent     = `All time`;
+  document.getElementById('kpiMargin').textContent      = `Margin: ${margin}%`;
+  document.getElementById('kpiTxSub').textContent       = `All time`;
 
   const profitEl = document.getElementById('kpiProfit');
   profitEl.style.color = profit >= 0 ? 'var(--income)' : 'var(--expense)';
 }
 
-// ─── RECENT TRANSACTIONS (Dashboard) ─────────────────────────────────────────
+// ─── RECENT TRANSACTIONS ─────────────────────────────────────────────────────
 function renderRecentTransactions() {
   const list   = document.getElementById('recentList');
   const empty  = document.getElementById('recentEmpty');
   const recent = [...transactions].sort((a,b) => new Date(b.date) - new Date(a.date)).slice(0, 5);
-
   list.innerHTML = '';
   if (recent.length === 0) { empty.style.display = 'block'; return; }
   empty.style.display = 'none';
   recent.forEach(t => list.appendChild(buildTxItem(t)));
 }
 
-// ─── TRANSACTION LIST (Transactions view) ────────────────────────────────────
+// ─── TRANSACTIONS VIEW ───────────────────────────────────────────────────────
 function setFilter(type, btn) {
   filterType = type;
   document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
@@ -118,9 +118,9 @@ function setFilter(type, btn) {
 }
 
 function getFiltered() {
-  const search   = (document.getElementById('searchInput')?.value || '').toLowerCase();
-  const catF     = document.getElementById('categoryFilter')?.value || 'all';
-  const sort     = document.getElementById('sortSelect')?.value || 'date-desc';
+  const search = (document.getElementById('searchInput')?.value || '').toLowerCase();
+  const catF   = document.getElementById('categoryFilter')?.value || 'all';
+  const sort   = document.getElementById('sortSelect')?.value || 'date-desc';
 
   let list = transactions.filter(t => {
     const matchType   = filterType === 'all' || t.type === filterType;
@@ -141,16 +141,16 @@ function getFiltered() {
 }
 
 function renderTransactions() {
-  const container = document.getElementById('txList');
-  const empty     = document.getElementById('txEmpty');
-  const summaryBar= document.getElementById('txSummaryBar');
+  const container  = document.getElementById('txList');
+  const empty      = document.getElementById('txEmpty');
+  const summaryBar = document.getElementById('txSummaryBar');
   if (!container) return;
 
   const filtered = getFiltered();
   container.innerHTML = '';
 
   if (filtered.length === 0) {
-    empty.style.display = 'block';
+    empty.style.display  = 'block';
     summaryBar.innerHTML = '';
     return;
   }
@@ -168,7 +168,7 @@ function renderTransactions() {
 }
 
 function buildTxItem(t, showActions = false) {
-  const div = document.createElement('div');
+  const div  = document.createElement('div');
   div.className = 'tx-item';
   const sign = t.type === 'income' ? '+' : '-';
   div.innerHTML = `
@@ -188,11 +188,11 @@ function buildTxItem(t, showActions = false) {
   return div;
 }
 
-// ─── MODAL (Add / Edit) ───────────────────────────────────────────────────────
+// ─── MODAL ───────────────────────────────────────────────────────────────────
 function openModal() {
   editingId = null;
-  document.getElementById('modalTitle').textContent    = 'Add Transaction';
-  document.getElementById('modalSaveBtn').textContent  = 'Add Transaction';
+  document.getElementById('modalTitle').textContent   = 'Add Transaction';
+  document.getElementById('modalSaveBtn').textContent = 'Add Transaction';
   document.getElementById('txName').value     = '';
   document.getElementById('txAmount').value   = '';
   document.getElementById('txNotes').value    = '';
@@ -287,6 +287,17 @@ function confirmDelete() {
   showToast('Transaction deleted.', 'error');
 }
 
+// ─── RESET ───────────────────────────────────────────────────────────────────
+function resetData() {
+  if (confirm('Delete ALL transactions and start fresh? This cannot be undone.')) {
+    transactions = [];
+    save();
+    renderAll();
+    populateYearDropdown();
+    showToast('All data cleared.', 'error');
+  }
+}
+
 // ─── CHARTS ──────────────────────────────────────────────────────────────────
 function populateYearDropdown() {
   const sel = document.getElementById('monthlyChartYear');
@@ -301,7 +312,7 @@ function populateYearDropdown() {
 function renderMonthlyChart() {
   const sel  = document.getElementById('monthlyChartYear');
   const year = sel ? parseInt(sel.value) : new Date().getFullYear();
-  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const months      = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   const incomeData  = Array(12).fill(0);
   const expenseData = Array(12).fill(0);
 
@@ -352,7 +363,11 @@ function renderCategoryChart() {
   if (categoryChart) categoryChart.destroy();
 
   if (labels.length === 0) {
-    categoryChart = new Chart(ctx, { type: 'doughnut', data: { labels: ['No data'], datasets: [{ data: [1], backgroundColor: ['#e2e8f0'] }] }, options: { plugins: { legend: { display: false } }, cutout: '65%' } });
+    categoryChart = new Chart(ctx, {
+      type: 'doughnut',
+      data: { labels: ['No data'], datasets: [{ data: [1], backgroundColor: ['#e2e8f0'] }] },
+      options: { plugins: { legend: { display: false } }, cutout: '65%' }
+    });
     document.getElementById('categoryLegend').innerHTML = '';
     return;
   }
@@ -363,8 +378,7 @@ function renderCategoryChart() {
     options: { responsive: true, cutout: '65%', plugins: { legend: { display: false } } }
   });
 
-  const legend = document.getElementById('categoryLegend');
-  legend.innerHTML = labels.map((l, i) => `
+  document.getElementById('categoryLegend').innerHTML = labels.map((l, i) => `
     <div class="legend-item">
       <div class="legend-dot" style="background:${colors[i]}"></div>
       <span>${l}</span>
@@ -449,9 +463,6 @@ function renderExpenseBreakdown() {
       }
     }
   });
-
-  const legend = document.getElementById('expenseLegend');
-  if (legend) legend.innerHTML = '';
 }
 
 function renderMonthTable() {
@@ -540,18 +551,16 @@ function generateInsights() {
   const profit        = totalIncome - totalExpenses;
   const margin        = totalIncome > 0 ? (profit / totalIncome * 100) : 0;
 
-  // Profit margin
   if (totalIncome > 0) {
     const type = margin >= 20 ? 'good' : 'warning';
     const icon = margin >= 20 ? '🏆' : margin >= 0 ? '⚠️' : '🚨';
     insights.push({ type, icon, title: `Profit margin: ${margin.toFixed(1)}%`, body: margin >= 20 ? `Strong margins! For every dollar of income, you keep ${margin.toFixed(0)} cents after expenses.` : margin >= 0 ? `Margins are slim. Consider reducing your biggest expense categories to improve profitability.` : `You're spending more than you earn. Review expenses urgently.` });
   }
 
-  // Month over month
-  const now   = new Date();
-  const thisM = monthlyData(now.getFullYear(), now.getMonth());
+  const now      = new Date();
+  const thisM    = monthlyData(now.getFullYear(), now.getMonth());
   const lastDate = new Date(now.getFullYear(), now.getMonth() - 1);
-  const lastM = monthlyData(lastDate.getFullYear(), lastDate.getMonth());
+  const lastM    = monthlyData(lastDate.getFullYear(), lastDate.getMonth());
 
   if (lastM.income > 0 || lastM.expense > 0) {
     const incGrowth = lastM.income > 0 ? ((thisM.income - lastM.income) / lastM.income * 100) : 0;
@@ -574,7 +583,6 @@ function generateInsights() {
     }
   }
 
-  // Biggest expense category
   const catTotals = {};
   transactions.filter(t => t.type === 'expense').forEach(t => {
     catTotals[t.category] = (catTotals[t.category] || 0) + t.amount;
@@ -585,11 +593,9 @@ function generateInsights() {
     insights.push({ type: 'info', icon: '🔍', title: `${biggestCat[0]} is your biggest cost (${pct}%)`, body: `You've spent ${fmt(biggestCat[1])} on ${biggestCat[0]}, which is ${pct}% of total expenses. ${pct > 40 ? 'This is quite concentrated — consider whether there are savings to find here.' : 'A well-distributed expense profile.'}` });
   }
 
-  // Transaction frequency
   const avgPerMonth = transactions.length / Math.max(uniqueMonths().length, 1);
   insights.push({ type: 'neutral', icon: '📋', title: `${avgPerMonth.toFixed(0)} transactions per month on average`, body: `You log ${avgPerMonth.toFixed(1)} entries per month. Consistent logging helps you catch trends early and gives you better data for decisions.` });
 
-  // Best month
   const monthMap = {};
   transactions.forEach(t => {
     const key = t.date.slice(0,7);
@@ -603,7 +609,6 @@ function generateInsights() {
     insights.push({ type: 'good', icon: '🌟', title: `Best month: ${label}`, body: `Your most profitable month generated a net profit of ${fmt(bestMonth.profit)}. Use it as a benchmark to aim for.` });
   }
 
-  // Cash flow warning
   if (profit < 0 && transactions.length > 5) {
     insights.push({ type: 'warning', icon: '⚠️', title: `Negative overall cash flow`, body: `Total expenses exceed total income by ${fmt(Math.abs(profit))}. If this continues, it may strain your operations. Focus on either growing income or cutting costs.` });
   }
@@ -623,6 +628,46 @@ function uniqueMonths() {
   return [...new Set(transactions.map(t => t.date.slice(0,7)))];
 }
 
+// ─── REVIEWS ─────────────────────────────────────────────────────────────────
+function renderAppReviews() {
+  const list    = document.getElementById('appReviewsList');
+  const empty   = document.getElementById('appReviewsEmpty');
+  const summary = document.getElementById('reviewSummary');
+  if (!list) return;
+
+  const reviews = JSON.parse(localStorage.getItem('ll_reviews') || '[]');
+  const sorted  = [...reviews].sort((a,b) => new Date(b.date) - new Date(a.date));
+
+  if (summary) {
+    if (reviews.length > 0) {
+      const avg = (reviews.reduce((a,r) => a + r.star, 0) / reviews.length).toFixed(1);
+      summary.textContent = `${reviews.length} review${reviews.length !== 1 ? 's' : ''} · ${avg} ★ avg`;
+    } else {
+      summary.textContent = '';
+    }
+  }
+
+  list.innerHTML = '';
+  if (sorted.length === 0) { empty.style.display = 'block'; return; }
+  empty.style.display = 'none';
+
+  sorted.forEach(r => {
+    const stars = '★'.repeat(r.star) + '☆'.repeat(5 - r.star);
+    const div = document.createElement('div');
+    div.className = 'tx-item';
+    div.innerHTML = `
+      <div style="font-size:22px; flex-shrink:0">${r.star >= 4 ? '😊' : r.star >= 3 ? '😐' : '😔'}</div>
+      <div class="tx-info">
+        <div class="tx-name">${escHtml(r.name)} — ${escHtml(r.business)}</div>
+        <div class="tx-meta" style="color:#f59e0b">${stars} · ${fmtDate(r.date)}</div>
+        <div class="tx-meta" style="margin-top:4px; color:var(--text-secondary); font-style:italic">"${escHtml(r.text)}"</div>
+        ${r.recommend ? `<div class="tx-meta" style="margin-top:2px">Would recommend: <strong>${escHtml(r.recommend)}</strong></div>` : ''}
+      </div>
+    `;
+    list.appendChild(div);
+  });
+}
+
 // ─── EXPORT CSV ──────────────────────────────────────────────────────────────
 function exportCSV() {
   if (transactions.length === 0) { showToast('No transactions to export.', 'error'); return; }
@@ -630,7 +675,7 @@ function exportCSV() {
   const rows = transactions
     .sort((a,b) => new Date(a.date) - new Date(b.date))
     .map(t => [t.date, `"${t.name.replace(/"/g,'""')}"`, t.type, t.category, t.amount.toFixed(2), `"${(t.notes||'').replace(/"/g,'""')}"`]);
-  const csv = [headers, ...rows].map(r => r.join(',')).join('\n');
+  const csv  = [headers, ...rows].map(r => r.join(',')).join('\n');
   const blob = new Blob([csv], { type: 'text/csv' });
   const url  = URL.createObjectURL(blob);
   const a    = document.createElement('a');
@@ -695,13 +740,3 @@ document.addEventListener('keydown', e => {
 
 // ─── START ───────────────────────────────────────────────────────────────────
 init();
-
-function resetData() {
-  if (confirm('Delete ALL transactions and start fresh? This cannot be undone.')) {
-    transactions = [];
-    save();
-    renderAll();
-    populateYearDropdown();
-    showToast('All data cleared.', 'error');
-  }
-}
